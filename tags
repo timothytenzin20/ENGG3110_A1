@@ -1,0 +1,6 @@
+Mmmanager_main	mmanager_main.c	/^main(int argc, char **argv)$/
+getAction	mmanager_parse.c	/^int getAction($/
+printAction	mmanager_parse.c	/^int printAction(FILE *outputfp, mmgr_action *actio/
+printHelp	mmanager_main.c	/^printHelp(FILE *fp, char *progname)$/
+runModel	mmanager_model.c	/^int runModel(FILE *outputfp, FILE *inputfp,$/
+strip	mmanager_parse.c	/^static char strip(char *s)$/
