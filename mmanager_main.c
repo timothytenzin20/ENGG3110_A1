@@ -6,19 +6,20 @@
 
 #include "mmanager.h"
 
-	/* external (global) variable declarations for getopt(3) */
+#define DEFAULT_PAINT_CHAR '~'
+
+/* external (global) variable declarations for getopt(3) */
 extern char *optarg;
 extern int optind;
 extern int optopt;
 extern int opterr;
 extern int optreset;
 
-
 /** forward declarations */
 static void printHelp(FILE *fp, char *progname);
+static void allocate(int id, size_t size, char paintCharacter);
 
-int
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
 	FILE *ofp = stdout;
 	int verbosity = 0;
@@ -28,7 +29,6 @@ main(int argc, char **argv)
 	int optionchar;
 	char *progname;
 	int i;
-
 
 	/**
 	 * save the name of the program for printing help,
@@ -40,13 +40,14 @@ main(int argc, char **argv)
 	if (argc == 1)
 	{
 		printHelp(stdout, progname);
-		exit (1);
+		exit(1);
 	}
- 
 
 	/** use getopt(3) to parse up any option flags we may have */
-	while ((optionchar = getopt(argc, argv, "vhs:o:m:")) != -1) {
-		switch (optionchar) {
+	while ((optionchar = getopt(argc, argv, "vhs:o:m:")) != -1)
+	{
+		switch (optionchar)
+		{
 
 		case 'o':
 			/* override the standard output destination */
@@ -59,7 +60,6 @@ main(int argc, char **argv)
 				exit(1);
 			}
 			break;
-
 
 		case 'm':
 			/*
@@ -79,25 +79,24 @@ main(int argc, char **argv)
 			}
 			break;
 
-
 		case 's':
+		{
+			if (strncasecmp(optarg, "fir", 3) == 0)
+				fitStrategy = STRAT_FIRST;
+			else if (strncasecmp(optarg, "bes", 3) == 0)
+				fitStrategy = STRAT_BEST;
+			else if (strncasecmp(optarg, "wor", 3) == 0)
+				fitStrategy = STRAT_WORST;
+			else
 			{
-				if (strncasecmp(optarg, "fir", 3) == 0)
-					fitStrategy = STRAT_FIRST;
-				else if (strncasecmp(optarg, "bes", 3) == 0)
-					fitStrategy = STRAT_BEST;
-				else if (strncasecmp(optarg, "wor", 3) == 0)
-					fitStrategy = STRAT_WORST;
-				else
-				{
-					fprintf(stderr,
+				fprintf(stderr,
 						"Strategy '%s' must be one of: first, best, worst\n",
 						optarg);
-					printHelp(stderr, progname);
-					exit (-1);
-				}
+				printHelp(stderr, progname);
+				exit(-1);
 			}
-			break;
+		}
+		break;
 
 		case 'v':
 			verbosity++;
@@ -106,7 +105,7 @@ main(int argc, char **argv)
 		case '?':
 		case 'h':
 		default:
-			/* 
+			/*
 			 * use fall-through to get here with any of these
 			 * three options
 			 */
@@ -114,19 +113,18 @@ main(int argc, char **argv)
 		}
 	}
 
-
-		/** skip past the arguments processed by getopt(3) */
+	/** skip past the arguments processed by getopt(3) */
 	argc -= optind;
 	argv += optind;
 
-		/** ensure a default strategy if none given, but warn of this */
+	/** ensure a default strategy if none given, but warn of this */
 	if (fitStrategy == 0)
 	{
 		printf("No strategy given -- assuming \"first fit\"\n");
 		fitStrategy = STRAT_FIRST;
 	}
 
-		/* anything that remains should be a file */
+	/* anything that remains should be a file */
 	for (i = 0; i < argc; i++)
 	{
 		FILE *datafp = fopen(argv[i], "r");
@@ -140,7 +138,7 @@ main(int argc, char **argv)
 		if (runModel(ofp, datafp, memsize, fitStrategy, verbosity) < 0)
 		{
 			fprintf(stderr, "Error returned from modelling -- aborting\n");
-			exit (2);
+			exit(2);
 		}
 		fclose(datafp);
 
@@ -161,13 +159,12 @@ main(int argc, char **argv)
 	return 0;
 }
 
-
 static void
 printHelp(FILE *fp, char *progname)
 {
 	fprintf(fp, "\n");
 	fprintf(fp, "%s [ <options> ] <input file> [ <input file> ...]\n",
-					progname);
+			progname);
 	fprintf(fp, "\n");
 	fprintf(fp, "Options:\n");
 	fprintf(fp, "\n");
@@ -184,4 +181,16 @@ printHelp(FILE *fp, char *progname)
 	fprintf(fp, "\n");
 }
 
+static void allocate(int id, size_t size, char paintCharacter)
+{
+	char *memory = (char *)malloc(size);
+	if (!memory)
+	{
+		printf("alloc %zu\n bytes : FAIL", size);
+		return;
+	}
 
+	// Paint the memory
+	memset(memory, paintCharacter, size);
+	return;
+}
