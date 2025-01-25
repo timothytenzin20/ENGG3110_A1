@@ -128,21 +128,16 @@ int runModel(FILE *outputfp, FILE *inputfp,
                     }
                 }
                 
-                nSuccessfulActions++;
+                /** increment our count of work we did */
+				nSuccessfulActions++;
             } else {
                 fprintf(outputfp, "free failed - no chunk with id %d\n", action.id);
             }
-		}
-
-		/** increment our count of work we did */
-		nSuccessfulActions++;
+		}	
 	}
-
-
+	
 	/** +++ Clean up your memory management */
 	free(memoryBlock);
-
-
 	return nSuccessfulActions;
 }
 
