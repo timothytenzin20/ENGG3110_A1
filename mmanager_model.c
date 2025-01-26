@@ -21,6 +21,17 @@ void printSummary(FILE *outputfp, chunk *chunks, int num_chunks, long totalMemor
 		}
 	}
 
+	// optional?: sort chunks 
+    for (int i = 0; i < num_chunks - 1; i++) {
+        for (int j = 0; j < num_chunks - i - 1; j++) {
+            if (chunks[j].start > chunks[j + 1].start) {
+                chunk temp = chunks[j];
+                chunks[j] = chunks[j + 1];
+                chunks[j + 1] = temp;
+            }
+        }
+    }
+
 	fprintf(outputfp, "SUMMARY:\n");
 	fprintf(outputfp, "%ld bytes allocated\n", allocatedBytes);
 	fprintf(outputfp, "%ld bytes free\n", freeBytes);
@@ -75,13 +86,13 @@ int runModel(FILE *outputfp, FILE *inputfp,
             int best_size = totalMemorySize + 1;
             int worst_size = -1;
 
-            // Search for suitable chunk based on strategy
+            // search for suitable chunk based on strategy
             for (int i = 0; i < num_chunks; i++) {
                 if (!chunks[i].is_allocated && chunks[i].size >= action.size) {
                     switch(fitStrategy) {
                         case STRAT_FIRST:
                             found_index = i;
-                            i = num_chunks; // Exit loop
+                            i = num_chunks; // exit loop
                             break;
                         case STRAT_BEST:
                             if (chunks[i].size < best_size) {
@@ -100,7 +111,7 @@ int runModel(FILE *outputfp, FILE *inputfp,
             }
 
             if (found_index != -1) {
-                // Split chunk if necessary
+                // split chunk if necessary
                 if (chunks[found_index].size > action.size) {
                     chunks[num_chunks].start = chunks[found_index].start + action.size;
                     chunks[num_chunks].size = chunks[found_index].size - action.size;
@@ -124,10 +135,10 @@ int runModel(FILE *outputfp, FILE *inputfp,
         } else
 		{
 			/* +++ do a release */
-			// Handle release/free action
+			// handle release/free action
             int found_index = -1;
             
-            // Find chunk with matching ID
+            // find chunk with matching ID
             for (int i = 0; i < num_chunks; i++) {
                 if (chunks[i].is_allocated && chunks[i].id == action.id) {
                     found_index = i;
@@ -136,23 +147,21 @@ int runModel(FILE *outputfp, FILE *inputfp,
             }
 
             if (found_index != -1) {
-                // Mark chunk as free
+                // mark chunk as free
                 chunks[found_index].is_allocated = FALSE;
                 chunks[found_index].id = -1;
                 fprintf(outputfp, "free location %d\n", chunks[found_index].start);
 
-                // Optional: Merge adjacent free chunks
+                // optional?: merge adjacent free chunks
                 for (int i = 0; i < num_chunks - 1; i++) {
                     if (!chunks[i].is_allocated && !chunks[i+1].is_allocated &&
                         (chunks[i].start + chunks[i].size == chunks[i+1].start)) {
-                        // Merge chunks[i] and chunks[i+1]
                         chunks[i].size += chunks[i+1].size;
-                        // Shift remaining chunks left
                         for (int j = i + 1; j < num_chunks - 1; j++) {
                             chunks[j] = chunks[j+1];
                         }
                         num_chunks--;
-                        i--; // Check this position again
+                        i--; // check this position again
                     }
                 }
                 
