@@ -1,5 +1,3 @@
 ./unpack
-./allocator
-./mmanager_main.o
-./mmanager_model.o
-./mmanager_parse.o
+allocator
+*.0
