@@ -1,9 +1,37 @@
-// https://cboard.cprogramming.com/c-programming/114795-allocate-memory-inside-allocated-memory-block.html
+/* References
+https://cboard.cprogramming.com/c-programming/114795-allocate-memory-inside-allocated-memory-block.html
+https://www.geeksforgeeks.org/best-fit-allocation-in-operating-system/
+
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
 
 #include "mmanager.h"
+
+void printSummary(FILE *outputfp, chunk *chunks, int num_chunks, long totalMemorySize) {
+	long allocatedBytes = 0;
+	long freeBytes = 0;
+
+	for (int i = 0; i < num_chunks; i++) {
+		if (chunks[i].is_allocated) {
+			allocatedBytes += chunks[i].size;
+		} else {
+			freeBytes += chunks[i].size;
+		}
+	}
+
+	fprintf(outputfp, "SUMMARY:\n");
+	fprintf(outputfp, "%ld bytes allocated\n", allocatedBytes);
+	fprintf(outputfp, "%ld bytes free\n", freeBytes);
+	fprintf(outputfp, "%d allocation chunks:\n", num_chunks);
+
+	for (int i = 0; i < num_chunks; i++) {
+		fprintf(outputfp, "chunk %2d location %4d:%4d bytes - %s\n",
+				i, chunks[i].start, chunks[i].size,
+				chunks[i].is_allocated ? "allocated" : "free");
+	}
+}
 
 int runModel(FILE *outputfp, FILE *inputfp,
 		long totalMemorySize, int fitStrategy,
@@ -136,6 +164,8 @@ int runModel(FILE *outputfp, FILE *inputfp,
 		}	
 	}
 	
+    printSummary(outputfp, chunks, num_chunks, totalMemorySize);
+    
 	/** +++ Clean up your memory management */
 	free(memoryBlock);
 	return nSuccessfulActions;

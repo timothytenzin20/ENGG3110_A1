@@ -17,7 +17,6 @@ extern int optreset;
 
 /** forward declarations */
 static void printHelp(FILE *fp, char *progname);
-static void allocate(int id, size_t size, char paintCharacter);
 
 int main(int argc, char **argv)
 {
@@ -179,18 +178,4 @@ printHelp(FILE *fp, char *progname)
 	fprintf(fp, "-v           : increase verbosity\n");
 
 	fprintf(fp, "\n");
-}
-
-static void allocate(int id, size_t size, char paintCharacter)
-{
-	char *memory = (char *)malloc(size);
-	if (!memory)
-	{
-		printf("alloc %zu\n bytes : FAIL", size);
-		return;
-	}
-
-	// Paint the memory
-	memset(memory, paintCharacter, size);
-	return;
 }
