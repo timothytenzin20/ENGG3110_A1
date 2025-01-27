@@ -15,6 +15,13 @@
 Throughout the development process, several tests were used. These tests ensured basic allocation and release functionality without using malloc() or other prohibited functions, preserving the principle of not adding more RAM to a computer. Furthermore, test cases featured adjacent free memory chunks to be respectively merged upon release if adjacent. Furthermore, this means managing the indices of each chunk as surrounding chunks are released. Testing ensured functionality across program iterations while introducing new errors to be fixed. Please note that all tests are not included in the final submission, only those that demonstrate the program's functionality and provide use cases for each allocation method. The included test results are as follows.
 
 ### Test Cases
+**Note:** Some of the following test cases will include the outputted summary from running the program. In these summaries the actual allocation and release outputs have been removed to reduce verbosity. These are denoted using 
+`
+’’’
+’’’
+`
+Please run the program as outlined to review the entire outputs.
+
 #### 1. smalltest-prof.txt
 **Commands:** `./allocator -m 4096 -s *type* smalltest-prof.txt`
 **Explanation:** This test case was generated to match the assignment outlines provided output. The default file given (smalltest.txt) failed to allocate an additional 512 bits as a fourth initial allocation and therefore differed in results. Adjusting this file allowed for cross-checking between assignment expectations and actual results.
