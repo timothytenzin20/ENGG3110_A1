@@ -48,6 +48,38 @@ void printSummary(FILE *outputfp, chunk *chunks, int num_chunks, long totalMemor
 	}
 }
 
+// helper function for merging chunks
+void mergeFreeChunks(chunk *chunks, int *num_chunks) {
+    // sort chunks by start location
+    for (int i = 0; i < *num_chunks - 1; i++) {
+        for (int j = 0; j < *num_chunks - i - 1; j++) {
+            if (chunks[j].start > chunks[j + 1].start) {
+                chunk temp = chunks[j];
+                chunks[j] = chunks[j + 1];
+                chunks[j + 1] = temp;
+            }
+        }
+    }
+
+    int i = 0;
+    while (i < *num_chunks - 1) {
+        if (!chunks[i].is_allocated && !chunks[i + 1].is_allocated) {
+            // ensure chunks are adjacent
+            if (chunks[i].start + chunks[i].size + sizeof(chunk) >= chunks[i + 1].start) {
+                chunks[i].size = (chunks[i + 1].start + chunks[i + 1].size) - chunks[i].start; // include the overhead space
+                
+                // shift chunks 
+                for (int j = i + 1; j < *num_chunks - 1; j++) {
+                    chunks[j] = chunks[j + 1];
+                }
+                (*num_chunks)--;
+                continue; 
+            }
+        }
+        i++;
+    }
+}
+
 int runModel(FILE *outputfp, FILE *inputfp,
 		long totalMemorySize, int fitStrategy,
 		int verbosity
@@ -86,7 +118,6 @@ int runModel(FILE *outputfp, FILE *inputfp,
     chunks[0].is_allocated = FALSE;
     chunks[0].id = -1;
     int num_chunks = 1;
-    long totalOverhead = chunkStructSize;
 
 	/**
 	 *	+++ Set up anything else you will need for your memory management
@@ -126,14 +157,14 @@ int runModel(FILE *outputfp, FILE *inputfp,
 
             if (found_index != -1) {
                 // split chunk if necessary
-                if (chunks[found_index].size > action.size + chunkStructSize) {
-                    chunks[num_chunks].start = chunks[found_index].start + action.size + chunkStructSize;
-                    chunks[num_chunks].size = chunks[found_index].size - action.size - chunkStructSize;
+                if (chunks[found_index].size > action.size + sizeof(chunk)) {
+                    // get start position of remaining chunk
+                    chunks[num_chunks].start = chunks[found_index].start + action.size;
+                    chunks[num_chunks].size = chunks[found_index].size - action.size - sizeof(chunk);
                     chunks[num_chunks].is_allocated = FALSE;
                     chunks[num_chunks].id = -1;
-                    chunks[num_chunks].paint = action.paint ? action.paint : '~'; // am i being redundant
+                    chunks[num_chunks].paint = action.paint ? action.paint : '~';
                     chunks[found_index].size = action.size;
-                    totalOverhead += chunkStructSize;
                     num_chunks++;
                 }
                 
@@ -167,18 +198,8 @@ int runModel(FILE *outputfp, FILE *inputfp,
                 chunks[found_index].id = -1;
                 fprintf(outputfp, "free location %d\n", chunks[found_index].start);
 
-                // optional?: merge adjacent free chunks
-                for (int i = 0; i < num_chunks - 1; i++) {
-                    if (!chunks[i].is_allocated && !chunks[i+1].is_allocated &&
-                        (chunks[i].start + chunks[i].size == chunks[i+1].start)) {
-                        chunks[i].size += chunks[i+1].size;
-                        for (int j = i + 1; j < num_chunks - 1; j++) {
-                            chunks[j] = chunks[j+1];
-                        }
-                        num_chunks--;
-                        i--; // check this position again
-                    }
-                }
+                // merge free chunks after each deallocation
+                mergeFreeChunks(chunks, &num_chunks); // WHY WONT YOU WORKKKKKKK
                 
                 /** increment our count of work we did */
 				nSuccessfulActions++;
