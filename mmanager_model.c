@@ -1,9 +1,20 @@
 /* References
-https://cboard.cprogramming.com/c-programming/114795-allocate-memory-inside-allocated-memory-block.html
-https://www.geeksforgeeks.org/best-fit-allocation-in-operating-system/
-https://www.geeksforgeeks.org/program-best-fit-algorithm-memory-management/?utm_source=chatgpt.com
-https://www.geeksforgeeks.org/program-worst-fit-algorithm-memory-management/
+• author: Bladactania
+• name: Thread: Allocate memory inside allocated memory block?
+• year: 2009
+• source: https://cboard.cprogramming.com/c-programming/114795-allocate-memory-inside-allocated-memory-block.html
+
+• author: geeksforgeeks
+• name: Best-Fit Allocation in Operating System
+• year: 2023
+• source: https://www.geeksforgeeks.org/best-fit-allocation-in-operating-system/
+
+• author: geeksforgeeks
+• name: Program for Worst Fit algorithm in Memory Management
+• year: 2023
+• source: https://www.geeksforgeeks.org/program-worst-fit-algorithm-memory-management/
 */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
