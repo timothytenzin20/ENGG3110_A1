@@ -1,7 +1,8 @@
 /* References
 https://cboard.cprogramming.com/c-programming/114795-allocate-memory-inside-allocated-memory-block.html
 https://www.geeksforgeeks.org/best-fit-allocation-in-operating-system/
-
+https://www.geeksforgeeks.org/program-best-fit-algorithm-memory-management/?utm_source=chatgpt.com
+https://www.geeksforgeeks.org/program-worst-fit-algorithm-memory-management/
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,6 +13,7 @@ https://www.geeksforgeeks.org/best-fit-allocation-in-operating-system/
 void printSummary(FILE *outputfp, chunk *chunks, int num_chunks, long totalMemorySize) {
 	long allocatedBytes = 0;
 	long freeBytes = 0;
+	long overhead = num_chunks * sizeof(chunk);
 
 	for (int i = 0; i < num_chunks; i++) {
 		if (chunks[i].is_allocated) {
@@ -35,6 +37,8 @@ void printSummary(FILE *outputfp, chunk *chunks, int num_chunks, long totalMemor
 	fprintf(outputfp, "SUMMARY:\n");
 	fprintf(outputfp, "%ld bytes allocated\n", allocatedBytes);
 	fprintf(outputfp, "%ld bytes free\n", freeBytes);
+    fprintf(outputfp, "%ld bytes overhead\n", overhead);
+	fprintf(outputfp, "Total memory usage: %ld bytes\n", allocatedBytes + freeBytes + overhead);
 	fprintf(outputfp, "%d allocation chunks:\n", num_chunks);
 
 	for (int i = 0; i < num_chunks; i++) {
@@ -68,12 +72,22 @@ int runModel(FILE *outputfp, FILE *inputfp,
 		perror("allocation failed!");
 		return -1;
 	}
-	chunk *chunks = (chunk*)memoryBlock;
-    chunks[0].start = 0;
-    chunks[0].size = totalMemorySize;
+    
+	// initial overhead for chunk management
+    long chunkStructSize = sizeof(chunk);
+    long availableMemory = totalMemorySize - chunkStructSize;
+
+    fprintf(outputfp, "overhead per chunk: %ld bytes\n", chunkStructSize);
+    fprintf(outputfp, "available memory: %ld bytes\n", availableMemory);
+
+    chunk *chunks = (chunk*)memoryBlock;
+    chunks[0].start = chunkStructSize;  
+    chunks[0].size = availableMemory;
     chunks[0].is_allocated = FALSE;
     chunks[0].id = -1;
     int num_chunks = 1;
+    long totalOverhead = chunkStructSize;
+
 	/**
 	 *	+++ Set up anything else you will need for your memory management
 	 */
@@ -112,19 +126,20 @@ int runModel(FILE *outputfp, FILE *inputfp,
 
             if (found_index != -1) {
                 // split chunk if necessary
-                if (chunks[found_index].size > action.size) {
-                    chunks[num_chunks].start = chunks[found_index].start + action.size;
-                    chunks[num_chunks].size = chunks[found_index].size - action.size;
+                if (chunks[found_index].size > action.size + chunkStructSize) {
+                    chunks[num_chunks].start = chunks[found_index].start + action.size + chunkStructSize;
+                    chunks[num_chunks].size = chunks[found_index].size - action.size - chunkStructSize;
                     chunks[num_chunks].is_allocated = FALSE;
                     chunks[num_chunks].id = -1;
                     chunks[num_chunks].paint = action.paint ? action.paint : '~'; // am i being redundant
                     chunks[found_index].size = action.size;
+                    totalOverhead += chunkStructSize;
                     num_chunks++;
                 }
                 
                 chunks[found_index].is_allocated = TRUE;
                 chunks[found_index].id = action.id;
-                chunks[found_index].paint = action.paint ? action.paint : '~';
+                chunks[found_index].paint = action.paint ? action.paint : '~'; // am i being redundant
                 
                 fprintf(outputfp, "alloc %d bytes : SUCCESS - return location %d\n", 
                        action.size, chunks[found_index].start);
