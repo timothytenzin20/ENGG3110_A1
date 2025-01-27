@@ -41,6 +41,7 @@ The final free chunk is at location 790, which is slightly smaller (5050 bytes) 
 Therefore, for systems using memory efficiently and minimizing fragmentation, best-fit is the preferred method. It utilizes smaller free chunks more effectively, leaving behind a larger merged free block (5330 bytes). 
 
 **SUMMARY:**
+```markdown
 tkhan12@linux-01:~/CIS3110/CIS3110-W25-A1-code$ ./allocator -m 6000 -s first best-fit.txt
 Running a first-fit model in 6000 (0x1770) bytes of memory.
 overhead per chunk: 20 bytes
@@ -100,6 +101,7 @@ chunk  3 location  570:  40 bytes - allocated
 chunk  4 location  610: 150 bytes - allocated
 chunk  5 location  760:  30 bytes - allocated
 chunk  6 location  790:5050 bytes - free
+```
 
 #### 3. worst-fit.txt
 **Commands:** `./allocator -m 2000 -s *type* worst-fit.txt`
@@ -121,6 +123,7 @@ The final free chunk is at location 1170, which is 730 bytes (slightly smaller t
 Therefore, all three strategies achieve identical memory allocation and free memory results; yet, for systems making large allocations the worst-fit strategy leaves a larger block to use, albeit with wasted smaller chunks existing. 
 
 **SUMMARY:**
+```markdown
 tkhan12@linux-01:~/CIS3110/CIS3110-W25-A1-code$ ./allocator -m 2000 -s first worst-fit.txt
 Running a first-fit model in 2000 (0x7d0) bytes of memory.
 overhead per chunk: 20 bytes
@@ -177,6 +180,7 @@ chunk  2 location  620: 300 bytes - allocated
 chunk  3 location  920: 100 bytes - allocated
 chunk  4 location 1020: 150 bytes - allocated
 chunk  5 location 1170: 730 bytes - free
+```
 
 #### 4. first-fit.txt
 **Commands:** `./allocator -m 2000 -s *type* first-fit.txt`
@@ -198,6 +202,7 @@ The final free chunk is at location 1120, which is 780 bytes (slightly smaller t
 Therefore, when a system needs to make fast allocations with relatively minimal fragmentation, first-fit is the best strategy. Although it can have fragmentations over time as we saw in previous tests, for the specified test file it operated at an optimal rate.
 
 **SUMMARY:**
+```markdown
 tkhan12@linux-01:~/CIS3110/CIS3110-W25-A1-code$ ./allocator -m 2000 -s first first-fit.txt
 Running a first-fit model in 2000 (0x7d0) bytes of memory.
 overhead per chunk: 20 bytes
@@ -252,6 +257,7 @@ chunk  2 location  320: 300 bytes - allocated
 chunk  3 location  620: 400 bytes - allocated
 chunk  4 location 1020: 100 bytes - allocated
 chunk  5 location 1120: 780 bytes - free
+```
 
 ## Overall Conclusion
 Across all the tests conducted some results were more similar than others. This reflects the three respective strategies as they utilize different techniques to allocate memory. First-fit allocation means a quicker allocation and performs well under simple circumstances, but can lead to fragmentations which waste space and slow the system down. Best-fit can perform well under fragmentation-prone cases as it can prioritize minimizing these fragments and search for the smallest available block. Still, this does mean a slower completion time as it must actively search for the ‘best’ not just the ‘first’. Meanwhile, worst-fit is good when trying to keep large blocks available for future allocations. Although this means being able to manage larger block allocations, it does mean inefficiency in smaller requirements and also has fragmentations. Conclusively it is reasonable to say all three have their optimal environments, but best-fit would likely be the most practical as the additional time is comparably smaller than the additional space lost by other methods.
