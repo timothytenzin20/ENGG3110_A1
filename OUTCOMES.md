@@ -11,7 +11,7 @@
 - [x] Creating experiments to explore different allocation patterns (15%)
 - [x] Final report, explaining your code and your findings (15%)
  
- Furthermore, I used `valgrind --leak-check=yes ***command***` to ensure
+ Furthermore, I used `valgrind --leak-check=yes ***command***` to ensure no memory leaks exist.
 ## Experiments Performed
 Throughout the development process, several tests were used. These tests ensured basic allocation and release functionality without using malloc() or other prohibited functions, preserving the principle of not adding more RAM to a computer. Furthermore, test cases featured adjacent free memory chunks to be respectively merged upon release if adjacent. Furthermore, this means managing the indices of each chunk as surrounding chunks are released. Testing ensured functionality across program iterations while introducing new errors to be fixed. Please note that all tests are not included in the final submission, only those that demonstrate the program's functionality and provide use cases for each allocation method. The included test results are as follows.
 
