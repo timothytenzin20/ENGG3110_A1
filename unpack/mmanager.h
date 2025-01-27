@@ -10,12 +10,23 @@
 #define		ACTION_ALLOCATE	0x10
 #define		ACTION_RELEASE	0x20
 
+#define FALSE 0
+#define TRUE 1
+
 typedef struct mmgr_action {
 	int type;
 	int id;
 	int size;
 	char paint;
 } mmgr_action;
+
+typedef struct chunk {
+    int start;
+    int size;
+    int is_allocated;
+    int id;
+    char paint;
+} chunk;
 
 int runModel(FILE *outputfp, FILE *inputfp,
 		long numberOfBytes, int fitStrategy,
