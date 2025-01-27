@@ -296,6 +296,7 @@ Lastly, working within `runModel` this given function required actual implementa
 7. Increment for the successful action complete
 ```
 Once again in this section of code I adjust for the overhead to ensure I accurately provide starting locations and sizes to each chunk. I first do any splitting needed and then once finished update the actual chunk based on the provided data. I do the defaulting of the paint value a second time here which may be redundant, but I believe it reduces chances for error and is worth including. Below I also include the logic to free:
+```markdown
 ## Free ##
 1. Find chunk by its ID
 2. Mark the chunk as free
